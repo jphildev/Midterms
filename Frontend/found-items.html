@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Found Items - Lost and Found System</title>
+
+    <link rel="stylesheet" href="found-items.css">
+</head>
+
+<body>
+
+    <header class="navbar">
+        <h1>Lost and Found System</h1>
+    </header>
+
+    <main class="container">
+
+        <!-- FOUND-FE-01 -->
+        <section class="form-section">
+
+            <h2>Report Found Item</h2>
+
+            <form id="foundItemForm">
+
+                <div class="form-group">
+                    <label for="itemName">Item Name</label>
+
+                    <input
+                        type="text"
+                        id="itemName"
+                        name="itemName"
+                        placeholder="Enter item name"
+                        required
+                    >
+                </div>
+
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+
+                    <textarea
+                        id="description"
+                        name="description"
+                        placeholder="Describe the found item"
+                        required
+                    ></textarea>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="category">Category</label>
+
+                    <select id="category" name="category" required>
+
+                        <option value="">
+                            Select Category
+                        </option>
+
+                        <option value="Electronics">
+                            Electronics
+                        </option>
+
+                        <option value="Documents">
+                            Documents
+                        </option>
+
+                        <option value="Clothing">
+                            Clothing
+                        </option>
+
+                        <option value="Accessories">
+                            Accessories
+                        </option>
+
+                        <option value="School Supplies">
+                            School Supplies
+                        </option>
+
+                        <option value="Others">
+                            Others
+                        </option>
+
+                    </select>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="location">Found Location</label>
+
+                    <input
+                        type="text"
+                        id="location"
+                        name="location"
+                        placeholder="Where was the item found?"
+                        required
+                    >
+                </div>
+
+
+                <div class="form-group">
+                    <label for="dateFound">Date Found</label>
+
+                    <input
+                        type="date"
+                        id="dateFound"
+                        name="dateFound"
+                        required
+                    >
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    Report Found Item
+                </button>
+
+            </form>
+
+        </section>
+
+
+        <!-- FOUND-FE-02 / FE-03 / FE-04 / FE-05 -->
+        <section class="items-section">
+
+            <div class="items-header">
+
+                <h2>Found Items</h2>
+
+                <!-- FOUND-FE-03 -->
+                <select id="categoryFilter">
+
+                    <option value="">
+                        All Categories
+                    </option>
+
+                    <option value="Electronics">
+                        Electronics
+                    </option>
+
+                    <option value="Documents">
+                        Documents
+                    </option>
+
+                    <option value="Clothing">
+                        Clothing
+                    </option>
+
+                    <option value="Accessories">
+                        Accessories
+                    </option>
+
+                    <option value="School Supplies">
+                        School Supplies
+                    </option>
+
+                    <option value="Others">
+                        Others
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- FOUND-FE-05 -->
+            <div
+                id="loadingMessage"
+                class="message loading"
+                hidden
+            >
+                Loading found items...
+            </div>
+
+
+            <div
+                id="errorMessage"
+                class="message error"
+                hidden
+            >
+                Unable to load found items.
+            </div>
+
+
+            <div
+                id="successMessage"
+                class="message success"
+                hidden
+            >
+            </div>
+
+
+            <!-- FOUND-FE-02 -->
+            <div
+                id="foundItemsList"
+                class="items-grid"
+            >
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script src="../found-items.js"></script>
+
+</body>
+</html>
