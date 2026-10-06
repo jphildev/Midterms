@@ -46,56 +46,94 @@ const createLostItem = async (req, res) => {
   }
 };
 
+// Builds a MongoDB filter from the optional category/status query params.
+// Returns { error } with a message when a value is not allowed.
+const buildFilter = ({ category, status }) => {
+  const filter = {};
+
+  if (category !== undefined) {
+    if (!LostItem.CATEGORIES.includes(category)) {
+      return { error: `Invalid category. Use one of: ${LostItem.CATEGORIES.join(', ')}` };
+    }
+    filter.category = category;
+  }
+
+  if (status !== undefined) {
+    if (!LostItem.STATUSES.includes(status)) {
+      return { error: `Invalid status. Use one of: ${LostItem.STATUSES.join(', ')}` };
+    }
+    filter.status = status;
+  }
+
+  return { filter };
+};
+
+// Runs a paginated, newest-first query and sends the list response.
+const sendPaginated = async (req, res, filter) => {
+  const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+  const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 20, 1), 100);
+
+  const [items, total] = await Promise.all([
+    LostItem.find(filter)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit),
+    LostItem.countDocuments(filter),
+  ]);
+
+  res.status(200).json({
+    success: true,
+    count: items.length,
+    total,
+    page,
+    pages: Math.ceil(total / limit),
+    data: items,
+  });
+};
+
+// Escapes characters that have a special meaning in regular expressions,
+// so a search like "c++" or "(blue)" is treated as plain text.
+const escapeRegex = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 // @desc    Get all lost items (newest first)
 // @route   GET /api/lost-items
 // @query   category, status, page (default 1), limit (default 20, max 100)
 const getLostItems = async (req, res) => {
   try {
-    const { category, status } = req.query;
-    const filter = {};
+    const { filter, error } = buildFilter(req.query);
+    if (error) return res.status(400).json({ success: false, message: error });
 
-    if (category !== undefined) {
-      if (!LostItem.CATEGORIES.includes(category)) {
-        return res.status(400).json({
-          success: false,
-          message: `Invalid category. Use one of: ${LostItem.CATEGORIES.join(', ')}`,
-        });
-      }
-      filter.category = category;
-    }
-
-    if (status !== undefined) {
-      if (!LostItem.STATUSES.includes(status)) {
-        return res.status(400).json({
-          success: false,
-          message: `Invalid status. Use one of: ${LostItem.STATUSES.join(', ')}`,
-        });
-      }
-      filter.status = status;
-    }
-
-    const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
-    const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 20, 1), 100);
-
-    const [items, total] = await Promise.all([
-      LostItem.find(filter)
-        .sort({ createdAt: -1 })
-        .skip((page - 1) * limit)
-        .limit(limit),
-      LostItem.countDocuments(filter),
-    ]);
-
-    res.status(200).json({
-      success: true,
-      count: items.length,
-      total,
-      page,
-      pages: Math.ceil(total / limit),
-      data: items,
-    });
+    await sendPaginated(req, res, filter);
   } catch (error) {
     console.error('getLostItems error:', error);
     res.status(500).json({ success: false, message: 'Server error while fetching lost items' });
+  }
+};
+
+// @desc    Search lost items by keyword (partial, case-insensitive)
+//          in itemName, description and location
+// @route   GET /api/lost-items/search
+// @query   q (required), category, status, page, limit
+const searchLostItems = async (req, res) => {
+  try {
+    const q = typeof req.query.q === 'string' ? req.query.q.trim() : '';
+    if (!q) {
+      return res.status(400).json({ success: false, message: 'Search keyword (q) is required' });
+    }
+    if (q.length > 100) {
+      return res.status(400).json({ success: false, message: 'Search keyword must not exceed 100 characters' });
+    }
+
+    const { filter, error } = buildFilter(req.query);
+    if (error) return res.status(400).json({ success: false, message: error });
+
+    const pattern = new RegExp(escapeRegex(q), 'i');
+    filter.$or = [{ itemName: pattern }, { description: pattern }, { location: pattern }];
+
+    await sendPaginated(req, res, filter);
+  } catch (error) {
+    console.error('searchLostItems error:', error);
+    res.status(500).json({ success: false, message: 'Server error while searching lost items' });
   }
 };
 
@@ -120,4 +158,4 @@ const getLostItemById = async (req, res) => {
   }
 };
 
-module.exports = { createLostItem, getLostItems, getLostItemById };
+module.exports = { createLostItem, getLostItems, searchLostItems, getLostItemById };
