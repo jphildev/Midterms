@@ -1,0 +1,16 @@
+{
+  "name": "midterms-backend",
+  "version": "1.0.0",
+  "description": "Lost and Found backend API (Node.js + Express + MongoDB)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^5.2.1",
+    "mongoose": "^9.11.0"
+  }
+}
