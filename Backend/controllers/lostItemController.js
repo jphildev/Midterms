@@ -158,4 +158,35 @@ const getLostItemById = async (req, res) => {
   }
 };
 
-module.exports = { createLostItem, getLostItems, searchLostItems, getLostItemById };
+// @desc    Delete a lost item by id
+// @route   DELETE /api/lost-items/:id
+const deleteLostItem = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid lost item id' });
+    }
+
+    const lostItem = await LostItem.findByIdAndDelete(id);
+    if (!lostItem) {
+      return res.status(404).json({ success: false, message: 'Lost item not found' });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Lost item deleted successfully',
+      data: lostItem,
+    });
+  } catch (error) {
+    console.error('deleteLostItem error:', error);
+    res.status(500).json({ success: false, message: 'Server error while deleting lost item' });
+  }
+};
+
+module.exports = {
+  createLostItem,
+  getLostItems,
+  searchLostItems,
+  getLostItemById,
+  deleteLostItem,
+};
