@@ -52,7 +52,11 @@
                 <div class="form-group">
                     <label for="category">Category</label>
 
-                    <select id="category" name="category" required>
+                    <select
+                        id="category"
+                        name="category"
+                        required
+                    >
 
                         <option value="">
                             Select Category
@@ -123,7 +127,7 @@
         </section>
 
 
-        <!-- FOUND-FE-02 / FE-03 / FE-04 / FE-05 -->
+        <!-- FOUND-FE-02 -->
         <section class="items-section">
 
             <div class="items-header">
@@ -176,6 +180,7 @@
             </div>
 
 
+            <!-- FOUND-FE-05 -->
             <div
                 id="errorMessage"
                 class="message error"
@@ -185,6 +190,7 @@
             </div>
 
 
+            <!-- FOUND-FE-05 -->
             <div
                 id="successMessage"
                 class="message success"
@@ -198,6 +204,12 @@
                 id="foundItemsList"
                 class="items-grid"
             >
+
+                <!--
+                    Found items will be displayed here
+                    by found-items.js
+                -->
+
             </div>
 
         </section>
@@ -205,6 +217,7 @@
     </main>
 
 
+    <!-- JavaScript -->
     <script src="../found-items.js"></script>
 
 </body>
